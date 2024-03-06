@@ -1,0 +1,41 @@
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test("Test Car API Response", function () {
+    var jsonData = pm.response.json();
+    pm.expect(jsonData.marca).to.eql("audi");
+    pm.expect(jsonData.refer).to.eql("a4");
+});
+
+pm.test("Response time is less than 200ms", function () {
+    pm.expect(pm.response.responseTime).to.be.below(200);
+});
+
+pm.test("Successful POST request", function () {
+    pm.expect(pm.response.code).to.be.oneOf([201, 202]);
+});
+
+const schema = {
+    "type": "object",
+    "properties": {
+        "car": {
+            "type": "string"
+        }
+    },
+    "required": ["car"]
+};
+// Test response structure using JSON schema validation
+pm.test('Response structure is valid for POST /car/:id', function () {
+    const jsonData = pm.response.json();
+    // Validate response data against schema
+    pm.expect(tv4.validate(jsonData, schema)).to.be.true;
+});
+
+pm.test("Body is correct", function () {
+   
+    const expectedBody = JSON.stringify({ car: 'auto de audi y un ID de 5' });
+    const responseBody = pm.response.text();
+    pm.expect(responseBody).to.eql(expectedBody);
+});
+
